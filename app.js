@@ -52,6 +52,14 @@ function getRatingClass(rating) {
     return 'rating-low';
 }
 
+function formatRating(num) {
+    var n = Math.round(num * 100) / 100;
+    if (n % 1 === 0) {
+        return n.toString();
+    }
+    return n.toFixed(2);
+}
+
 
 /* ===========================
    ===== الأفلام =====
@@ -87,7 +95,7 @@ async function loadMovies() {
     movies.forEach(function(movie) {
         html += '<div class="item-card">' +
             '<div class="item-rating ' + getRatingClass(movie.rating) + '">' +
-                Number(movie.rating).toFixed(2) +
+                formatRating(movie.rating) +
             '</div>' +
             '<div class="item-info">' +
                 '<div class="item-title">' + escapeHtml(movie.title) + '</div>' +
@@ -185,7 +193,7 @@ async function loadSeries() {
         var seasonWord = s.seasons === 1 ? 'موسم' : 'مواسم';
         html += '<div class="item-card">' +
             '<div class="item-rating ' + getRatingClass(s.rating) + '">' +
-                Number(s.rating).toFixed(2) +
+                formatRating(s.rating) +
             '</div>' +
             '<div class="item-info">' +
                 '<div class="item-title">' + escapeHtml(s.title) + '</div>' +
