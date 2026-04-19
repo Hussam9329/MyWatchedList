@@ -1,177 +1,329 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة المشاهدة - أفلام ومسلسلات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>قائمة المشاهدة - أفلام ومسلسلات</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="bg-effects">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+  </div>
 
-    <div class="bg-effects">
-        <div class="glow glow-1"></div>
-        <div class="glow glow-2"></div>
-        <div class="glow glow-3"></div>
-    </div>
+  <div class="container">
+    <header class="main-header">
+      <div class="top-controls">
+        <button id="theme-toggle" class="icon-btn" title="تبديل الوضع">
+          <i class="fas fa-moon"></i>
+        </button>
 
-    <div class="container">
+        <div class="accent-wrap">
+          <label for="accent-picker">اللون</label>
+          <input type="color" id="accent-picker" value="#d4a843" />
+        </div>
+      </div>
 
-        <header class="main-header">
-            <div class="logo-icon">
-                <i class="fas fa-film"></i>
+      <div class="logo-icon">
+        <i class="fas fa-film"></i>
+      </div>
+      <h1>قائمة المشاهدة</h1>
+      <p class="subtitle">سجّل كل ما شاهدته من أفلام ومسلسلات + اكتشف فيلم الليلة 🎬</p>
+    </header>
+
+    <section class="dashboard-card">
+      <h2 class="list-title"><i class="fas fa-chart-line"></i> إحصائيات سريعة</h2>
+      <div class="stats-grid">
+        <div class="stat-item"><span>عدد الأعمال</span><strong id="stat-total">0</strong></div>
+        <div class="stat-item"><span>أكثر Genre</span><strong id="stat-top-genre">-</strong></div>
+        <div class="stat-item"><span>متوسط التقييم</span><strong id="stat-avg-rating">0</strong></div>
+        <div class="stat-item"><span>أكثر سنة إنتاج</span><strong id="stat-top-year">-</strong></div>
+        <div class="stat-item"><span>مشاهدات هذا الشهر</span><strong id="stat-this-month">0</strong></div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="movies">
+        <i class="fas fa-clapperboard"></i>
+        <span>الأفلام</span>
+      </button>
+      <button class="tab" data-tab="series">
+        <i class="fas fa-tv"></i>
+        <span>المسلسلات</span>
+      </button>
+    </nav>
+
+    <!-- Movies -->
+    <section id="movies-section" class="tab-content active">
+      <div class="form-card">
+        <h2 class="form-title">
+          <i class="fas fa-plus-circle"></i>
+          <span id="movie-form-title">إضافة فيلم جديد</span>
+        </h2>
+
+        <form id="movie-form">
+          <input type="hidden" id="movie-id" />
+
+          <div class="form-group">
+            <label for="movie-title">اسم الفيلم</label>
+            <input type="text" id="movie-title" placeholder="مثال: Interstellar" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movie-year">سنة الإنتاج</label>
+              <input type="number" id="movie-year" placeholder="2024" min="1900" max="2100" required />
             </div>
-            <h1>قائمة المشاهدة</h1>
-            <p class="subtitle">سجّل كل ما شاهدته من أفلام ومسلسلات</p>
-        </header>
 
-        <nav class="tabs">
-            <button class="tab active" data-tab="movies">
-                <i class="fas fa-clapperboard"></i>
-                <span>الأفلام</span>
+            <div class="form-group">
+              <label for="movie-genre">التصنيف</label>
+              <select id="movie-genre" required>
+                <option value="">اختر النوع</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Anime">Anime</option>
+                <option value="Animation">Animation</option>
+                <option value="Biography">Biography</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Comics">Comics</option>
+                <option value="Crime">Crime</option>
+                <option value="Disaster">Disaster</option>
+                <option value="Documentary">Documentary</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="History">History</option>
+                <option value="Horror">Horror</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Thriller">Thriller</option>
+                <option value="War">War</option>
+                <option value="Western">Western</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movie-rating">تقييمي الشخصي (من 100)</label>
+              <div class="rating-input-wrapper">
+                <input type="number" id="movie-rating" placeholder="85.5" min="0" max="100" step="any" required />
+                <span class="rating-max">/ 100</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="movie-runtime">المدة بالدقائق (اختياري)</label>
+              <input type="number" id="movie-runtime" placeholder="120" min="1" max="400" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movie-status">الحالة</label>
+              <select id="movie-status" required>
+                <option value="watched">Watched</option>
+                <option value="watching">Watching</option>
+                <option value="plan">Plan to Watch</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="movie-rewatch">هل يستحق إعادة مشاهدة؟</label>
+              <select id="movie-rewatch" required>
+                <option value="true">✅ نعم</option>
+                <option value="false">❌ لا</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit" id="movie-submit-btn">
+              <i class="fas fa-plus"></i>
+              إضافة الفيلم
             </button>
-            <button class="tab" data-tab="series">
-                <i class="fas fa-tv"></i>
-                <span>المسلسلات</span>
+            <button type="button" class="btn-secondary" id="movie-cancel-edit" hidden>إلغاء التعديل</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Filters -->
+      <div class="list-card">
+        <h2 class="list-title"><i class="fas fa-filter"></i> فلترة وبحث</h2>
+
+        <div class="filters-grid">
+          <div class="form-group">
+            <label for="movie-search">بحث مباشر</label>
+            <input type="text" id="movie-search" placeholder="ابحث باسم الفيلم..." />
+          </div>
+
+          <div class="form-group">
+            <label for="filter-genre">النوع</label>
+            <select id="filter-genre">
+              <option value="">الكل</option>
+              <option value="Action">Action</option>
+              <option value="Adventure">Adventure</option>
+              <option value="Anime">Anime</option>
+              <option value="Animation">Animation</option>
+              <option value="Biography">Biography</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Comics">Comics</option>
+              <option value="Crime">Crime</option>
+              <option value="Disaster">Disaster</option>
+              <option value="Documentary">Documentary</option>
+              <option value="Drama">Drama</option>
+              <option value="Fantasy">Fantasy</option>
+              <option value="History">History</option>
+              <option value="Horror">Horror</option>
+              <option value="Mystery">Mystery</option>
+              <option value="Romance">Romance</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Thriller">Thriller</option>
+              <option value="War">War</option>
+              <option value="Western">Western</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="filter-year">السنة</label>
+            <input type="number" id="filter-year" placeholder="مثال: 2024" min="1900" max="2100" />
+          </div>
+
+          <div class="form-group">
+            <label for="filter-min-rating">تقييم أعلى من</label>
+            <input type="number" id="filter-min-rating" placeholder="70" min="0" max="100" step="any" />
+          </div>
+
+          <div class="form-group">
+            <label for="filter-status">الحالة</label>
+            <select id="filter-status">
+              <option value="">الكل</option>
+              <option value="watched">Watched</option>
+              <option value="watching">Watching</option>
+              <option value="plan">Plan to Watch</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="sort-movies">الترتيب</label>
+            <select id="sort-movies">
+              <option value="latest_added">حسب مدة الإضافة (Latest added)</option>
+              <option value="rating_desc">الأعلى تقييمًا</option>
+              <option value="year_desc">الأحدث</option>
+              <option value="year_asc">الأقدم</option>
+              <option value="title_asc">A-Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn-secondary" id="clear-movie-filters">مسح الفلاتر</button>
+          <button class="btn-accent" id="movie-night-btn"><i class="fas fa-dice"></i> اختار لي فيلم الليلة</button>
+        </div>
+
+        <div id="movie-night-result" class="picker-result" hidden></div>
+      </div>
+
+      <div class="list-card">
+        <h2 class="list-title">
+          <i class="fas fa-list"></i>
+          الأفلام
+          <span id="movies-count" class="count-badge">0</span>
+        </h2>
+        <div id="movies-list" class="items-list">
+          <div class="empty-state">
+            <i class="fas fa-film fa-3x"></i>
+            <p>لم تضف أي أفلام بعد</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Series -->
+    <section id="series-section" class="tab-content">
+      <div class="form-card">
+        <h2 class="form-title">
+          <i class="fas fa-plus-circle"></i>
+          <span id="series-form-title">إضافة مسلسل جديد</span>
+        </h2>
+
+        <form id="series-form">
+          <input type="hidden" id="series-id" />
+
+          <div class="form-group">
+            <label for="series-title">اسم المسلسل</label>
+            <input type="text" id="series-title" placeholder="مثال: Breaking Bad" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="series-year">سنة الإنتاج</label>
+              <input type="number" id="series-year" placeholder="2008" min="1900" max="2100" required />
+            </div>
+            <div class="form-group">
+              <label for="series-seasons">عدد المواسم</label>
+              <input type="number" id="series-seasons" placeholder="5" min="1" max="100" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="series-rating">تقييمي الشخصي (من 100)</label>
+              <div class="rating-input-wrapper">
+                <input type="number" id="series-rating" placeholder="90.5" min="0" max="100" step="any" required />
+                <span class="rating-max">/ 100</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="series-rewatch">هل يستحق إعادة مشاهدة؟</label>
+              <select id="series-rewatch" required>
+                <option value="true">✅ نعم</option>
+                <option value="false">❌ لا</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit" id="series-submit-btn">
+              <i class="fas fa-plus"></i>
+              إضافة المسلسل
             </button>
-        </nav>
+            <button type="button" class="btn-secondary" id="series-cancel-edit" hidden>إلغاء التعديل</button>
+          </div>
+        </form>
+      </div>
 
-        <section id="movies-section" class="tab-content active">
+      <div class="list-card">
+        <h2 class="list-title">
+          <i class="fas fa-list"></i>
+          المسلسلات
+          <span id="series-count" class="count-badge">0</span>
+        </h2>
+        <div id="series-list" class="items-list">
+          <div class="empty-state">
+            <i class="fas fa-tv fa-3x"></i>
+            <p>لم تضف أي مسلسلات بعد</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="form-card">
-                <h2 class="form-title">
-                    <i class="fas fa-plus-circle"></i>
-                    إضافة فيلم جديد
-                </h2>
-                <form id="movie-form">
-                    <div class="form-group">
-                        <label for="movie-title">اسم الفيلم</label>
-                        <input type="text" id="movie-title" placeholder="مثال: Interstellar" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="movie-year">سنة الإنتاج</label>
-                            <input type="number" id="movie-year" placeholder="2024" min="1900" max="2030" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="movie-genre">التصنيف</label>
-                            <select id="movie-genre" required>
-                                <option value="">Choose Genre</option>
-<option value="">Choose Genre</option>
-<option value="Action">Action</option>
-<option value="Adventure">Adventure</option>
-<option value="Anime">Anime</option>
-<option value="Animation">Animation</option>
-<option value="Biography">Biography</option>
-<option value="Comedy">Comedy</option>
-<option value="Comics">Comics</option>
-<option value="Crime">Crime</option>
-<option value="Disaster">Disaster</option>
-<option value="Documentary">Documentary</option>
-<option value="Drama">Drama</option>
-<option value="Fantasy">Fantasy</option>
-<option value="History">History</option>
-<option value="Horror">Horror</option>
-<option value="Mystery">Mystery</option>
-<option value="Other">Other</option>
-<option value="Romance">Romance</option>
-<option value="Sci-Fi">Sci-Fi</option>
-<option value="Thriller">Thriller</option>
-<option value="War">War</option>
-<option value="Western">Western</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="movie-rating">تقييمي الشخصي (من 100)</label>
-                        <div class="rating-input-wrapper">
-                            <input type="number" id="movie-rating" placeholder="85.313141" min="0" max="100" step="any" required>
-                            <span class="rating-max">/ 100</span>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-plus"></i>
-                        إضافة الفيلم
-                    </button>
-                </form>
-            </div>
+    <footer class="page-footer">
+      <p>مشروع قائمة المشاهدة — HTML + CSS + JavaScript + Supabase</p>
+    </footer>
+  </div>
 
-            <div class="list-card">
-                <h2 class="list-title">
-                    <i class="fas fa-list"></i>
-                    الأفلام التي شاهدتها
-                    <span id="movies-count" class="count-badge">0</span>
-                </h2>
-                <div id="movies-list" class="items-list">
-                    <div class="empty-state">
-                        <i class="fas fa-film fa-3x"></i>
-                        <p>لم تضف أي أفلام بعد</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <div id="toast" class="toast"></div>
 
-        <section id="series-section" class="tab-content">
-
-            <div class="form-card">
-                <h2 class="form-title">
-                    <i class="fas fa-plus-circle"></i>
-                    إضافة مسلسل جديد
-                </h2>
-                <form id="series-form">
-                    <div class="form-group">
-                        <label for="series-title">اسم المسلسل</label>
-                        <input type="text" id="series-title" placeholder="مثال: Breaking Bad" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="series-year">سنة الإنتاج</label>
-                            <input type="number" id="series-year" placeholder="2008" min="1900" max="2030" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="series-seasons">عدد المواسم</label>
-                            <input type="number" id="series-seasons" placeholder="5" min="1" max="100" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="series-rating">تقييمي الشخصي (من 100)</label>
-                        <div class="rating-input-wrapper">
-                            <input type="number" id="series-rating" placeholder="90.141414" min="0" max="100" step="any" required>
-                            <span class="rating-max">/ 100</span>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-plus"></i>
-                        إضافة المسلسل
-                    </button>
-                </form>
-            </div>
-
-            <div class="list-card">
-                <h2 class="list-title">
-                    <i class="fas fa-list"></i>
-                    المسلسلات التي شاهدتها
-                    <span id="series-count" class="count-badge">0</span>
-                </h2>
-                <div id="series-list" class="items-list">
-                    <div class="empty-state">
-                        <i class="fas fa-tv fa-3x"></i>
-                        <p>لم تضف أي مسلسلات بعد</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="page-footer">
-            <p>مشروع قائمة المشاهدة &mdash; مبني بـ HTML و CSS و JavaScript مع Supabase</p>
-        </footer>
-
-    </div>
-
-    <div id="toast" class="toast"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
 </body>
 </html>
