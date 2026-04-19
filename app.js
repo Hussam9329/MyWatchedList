@@ -332,7 +332,9 @@ function renderMovies() {
    Print filtered movies
    =========================== */
 function printFilteredMovies() {
-  const filtered = applyMovieFiltersOnAll(allMoviesForStats || []);
+  const filtered = applyMovieFiltersOnAll(allMoviesForStats || [])
+  .sort((a, b) => (a.title || '').localeCompare((b.title || ''), 'en', { sensitivity: 'base' }));
+
 
   if (!filtered.length) {
     showToast('لا توجد نتائج للطباعة حسب الفلاتر الحالية', 'error');
