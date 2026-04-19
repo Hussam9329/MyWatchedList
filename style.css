@@ -486,3 +486,10 @@ body {
     visibility: hidden !important;
   }
 }
+/* إخفاء الهيدر في الجوال */
+@media (max-width: 768px) {
+  header {
+    display: none !important;
+  }
+}
+
