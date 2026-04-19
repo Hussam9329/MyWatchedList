@@ -4,26 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قائمة المشاهدة - أفلام ومسلسلات</title>
-    <!-- خط عربي جميل من Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-    <!-- أيقونات من Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- ملف التنسيقات -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- الخلفية المتحركة -->
     <div class="bg-effects">
         <div class="glow glow-1"></div>
         <div class="glow glow-2"></div>
         <div class="glow glow-3"></div>
     </div>
 
-    <!-- الحاوية الرئيسية -->
     <div class="container">
 
-        <!-- العنوان الرئيسي -->
         <header class="main-header">
             <div class="logo-icon">
                 <i class="fas fa-film"></i>
@@ -32,7 +26,6 @@
             <p class="subtitle">سجّل كل ما شاهدته من أفلام ومسلسلات</p>
         </header>
 
-        <!-- التبويبات -->
         <nav class="tabs">
             <button class="tab active" data-tab="movies">
                 <i class="fas fa-clapperboard"></i>
@@ -44,10 +37,8 @@
             </button>
         </nav>
 
-        <!-- ========== واجهة الأفلام ========== -->
         <section id="movies-section" class="tab-content active">
 
-            <!-- نموذج إضافة فيلم -->
             <div class="form-card">
                 <h2 class="form-title">
                     <i class="fas fa-plus-circle"></i>
@@ -84,7 +75,7 @@
                     <div class="form-group">
                         <label for="movie-rating">تقييمي الشخصي (من 100)</label>
                         <div class="rating-input-wrapper">
-                            <input type="number" id="movie-rating" placeholder="85.50" min="0" max="100" step="0.01" required>
+                            <input type="number" id="movie-rating" placeholder="85.313141" min="0" max="100" step="any" required>
                             <span class="rating-max">/ 100</span>
                         </div>
                     </div>
@@ -95,7 +86,6 @@
                 </form>
             </div>
 
-            <!-- قائمة الأفلام -->
             <div class="list-card">
                 <h2 class="list-title">
                     <i class="fas fa-list"></i>
@@ -111,10 +101,8 @@
             </div>
         </section>
 
-        <!-- ========== واجهة المسلسلات ========== -->
         <section id="series-section" class="tab-content">
 
-            <!-- نموذج إضافة مسلسل -->
             <div class="form-card">
                 <h2 class="form-title">
                     <i class="fas fa-plus-circle"></i>
@@ -138,7 +126,7 @@
                     <div class="form-group">
                         <label for="series-rating">تقييمي الشخصي (من 100)</label>
                         <div class="rating-input-wrapper">
-                            <input type="number" id="series-rating" placeholder="90.50" min="0" max="100" step="0.01" required>
+                            <input type="number" id="series-rating" placeholder="90.141414" min="0" max="100" step="any" required>
                             <span class="rating-max">/ 100</span>
                         </div>
                     </div>
@@ -149,7 +137,6 @@
                 </form>
             </div>
 
-            <!-- قائمة المسلسلات -->
             <div class="list-card">
                 <h2 class="list-title">
                     <i class="fas fa-list"></i>
@@ -165,19 +152,15 @@
             </div>
         </section>
 
-        <!-- تذييل الصفحة -->
         <footer class="page-footer">
             <p>مشروع قائمة المشاهدة &mdash; مبني بـ HTML و CSS و JavaScript مع Supabase</p>
         </footer>
 
     </div>
 
-    <!-- رسالة التنبيه المخصصة -->
     <div id="toast" class="toast"></div>
 
-    <!-- مكتبة Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ملف التطبيق -->
     <script src="app.js"></script>
 </body>
 </html>
