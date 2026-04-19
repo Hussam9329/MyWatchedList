@@ -10,8 +10,8 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    =========================== */
 let recentMovies = []; // آخر 5 فقط للعرض
 let recentSeries = []; // آخر 5 فقط للعرض
-let allMoviesForStats = []; // كل الأفلام للإحصائيات + picker
-let allSeriesForStats = []; // كل المسلسلات للإحصائيات
+let allMoviesForStats = []; // كل الأفلام للإحصائيات + picker + print
+let allSeriesForStats = []; // كل المسلسلات
 
 let movieSearchTimer = null;
 let seriesSearchTimer = null;
@@ -45,6 +45,7 @@ const filterMinRating = document.getElementById('filter-min-rating');
 const filterStatus = document.getElementById('filter-status');
 const sortMovies = document.getElementById('sort-movies');
 const clearMovieFiltersBtn = document.getElementById('clear-movie-filters');
+const printMovieFiltersBtn = document.getElementById('print-movie-filters');
 
 const seriesSearch = document.getElementById('series-search');
 const filterSeriesYear = document.getElementById('filter-series-year');
@@ -74,7 +75,6 @@ function showToast(message, type) {
   toast.className = `toast toast-${type} show`;
   setTimeout(() => toast.classList.remove('show'), 2200);
 }
-
 function escapeHtml(text = '') {
   const div = document.createElement('div');
   div.textContent = text;
@@ -149,7 +149,7 @@ tabs.forEach((tab) => {
 });
 
 /* ===========================
-   Fetch all with pagination (for stats)
+   Fetch all with pagination
    =========================== */
 async function fetchAllRows(tableName, orderColumn = 'created_at') {
   const pageSize = 1000;
@@ -233,7 +233,7 @@ async function loadStatsData() {
 }
 
 /* ===========================
-   Filters movies (on recent 5 display only)
+   Filters movies
    =========================== */
 function applyMovieFilters(arr) {
   let result = [...arr];
@@ -252,20 +252,39 @@ function applyMovieFilters(arr) {
   if (st) result = result.filter((m) => (m.status || 'watched') === st);
 
   switch (sort) {
-    case 'rating_desc':
-      result.sort((a, b) => Number(b.rating) - Number(a.rating));
-      break;
-    case 'year_desc':
-      result.sort((a, b) => Number(b.year) - Number(a.year));
-      break;
-    case 'year_asc':
-      result.sort((a, b) => Number(a.year) - Number(b.year));
-      break;
-    case 'title_asc':
-      result.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-      break;
-    default:
-      result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    case 'rating_desc': result.sort((a, b) => Number(b.rating) - Number(a.rating)); break;
+    case 'year_desc': result.sort((a, b) => Number(b.year) - Number(a.year)); break;
+    case 'year_asc': result.sort((a, b) => Number(a.year) - Number(b.year)); break;
+    case 'title_asc': result.sort((a, b) => (a.title || '').localeCompare(b.title || '')); break;
+    default: result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
+  return result;
+}
+
+/* نفس فلترة الأفلام لكن على كل البيانات (للطباعة) */
+function applyMovieFiltersOnAll(arr) {
+  let result = [...arr];
+
+  const q = movieSearch.value.trim().toLowerCase();
+  const g = filterGenre.value;
+  const y = Number(filterYear.value);
+  const minR = Number(filterMinRating.value);
+  const st = filterStatus.value;
+  const sort = sortMovies.value;
+
+  if (q) result = result.filter((m) => (m.title || '').toLowerCase().includes(q));
+  if (g) result = result.filter((m) => m.genre === g);
+  if (filterYear.value) result = result.filter((m) => Number(m.year) === y);
+  if (filterMinRating.value) result = result.filter((m) => Number(m.rating) >= minR);
+  if (st) result = result.filter((m) => (m.status || 'watched') === st);
+
+  switch (sort) {
+    case 'rating_desc': result.sort((a, b) => Number(b.rating) - Number(a.rating)); break;
+    case 'year_desc': result.sort((a, b) => Number(b.year) - Number(a.year)); break;
+    case 'year_asc': result.sort((a, b) => Number(a.year) - Number(b.year)); break;
+    case 'title_asc': result.sort((a, b) => (a.title || '').localeCompare(b.title || '')); break;
+    default: result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 
   return result;
@@ -310,7 +329,90 @@ function renderMovies() {
 }
 
 /* ===========================
-   Filters series (on recent 5 display only)
+   Print filtered movies
+   =========================== */
+function printFilteredMovies() {
+  const filtered = applyMovieFiltersOnAll(allMoviesForStats || []);
+
+  if (!filtered.length) {
+    showToast('لا توجد نتائج للطباعة حسب الفلاتر الحالية', 'error');
+    return;
+  }
+
+  const filtersSummary = `
+    السنة: ${escapeHtml(filterYear.value || 'الكل')} |
+    النوع: ${escapeHtml(filterGenre.value || 'الكل')} |
+    الحالة: ${escapeHtml(filterStatus.value || 'الكل')} |
+    أعلى من تقييم: ${escapeHtml(filterMinRating.value || 'بدون')} |
+    بحث: ${escapeHtml(movieSearch.value || 'بدون')}
+  `;
+
+  const rows = filtered.map((m, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td>${escapeHtml(m.title || '')}</td>
+      <td>${m.year ?? '-'}</td>
+      <td>${escapeHtml(m.genre || '-')}</td>
+      <td>${statusLabel(m.status || 'watched')}</td>
+      <td>${formatRating(m.rating)}</td>
+      <td>${(m.rewatch === true || m.rewatch === 'true') ? '✅ نعم' : '❌ لا'}</td>
+    </tr>
+  `).join('');
+
+  const printWindow = window.open('', '_blank', 'width=1100,height=800');
+  if (!printWindow) {
+    showToast('المتصفح منع فتح نافذة الطباعة', 'error');
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8" />
+      <title>طباعة الأفلام المفلترة</title>
+      <style>
+        body { font-family: Tahoma, Arial, sans-serif; padding: 22px; color: #111; }
+        h1 { margin: 0 0 6px; font-size: 22px; }
+        .meta { color: #444; margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+        .count { margin: 8px 0 12px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #888; padding: 8px; font-size: 12px; text-align: center; }
+        th { background: #f1f1f1; }
+      </style>
+    </head>
+    <body>
+      <h1>قائمة الأفلام المفلترة</h1>
+      <div class="meta">${filtersSummary}</div>
+      <div class="count">عدد النتائج: ${filtered.length}</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>اسم الفيلم</th>
+            <th>السنة</th>
+            <th>النوع</th>
+            <th>الحالة</th>
+            <th>تقييمي</th>
+            <th>إعادة مشاهدة</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+  }, 250);
+}
+
+/* ===========================
+   Filters series
    =========================== */
 function applySeriesFilters(arr) {
   let result = [...arr];
@@ -327,20 +429,11 @@ function applySeriesFilters(arr) {
   if (rw) result = result.filter((s) => String(s.rewatch === true || s.rewatch === 'true') === rw);
 
   switch (sort) {
-    case 'rating_desc':
-      result.sort((a, b) => Number(b.rating) - Number(a.rating));
-      break;
-    case 'year_desc':
-      result.sort((a, b) => Number(b.year) - Number(a.year));
-      break;
-    case 'year_asc':
-      result.sort((a, b) => Number(a.year) - Number(b.year));
-      break;
-    case 'title_asc':
-      result.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-      break;
-    default:
-      result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    case 'rating_desc': result.sort((a, b) => Number(b.rating) - Number(a.rating)); break;
+    case 'year_desc': result.sort((a, b) => Number(b.year) - Number(a.year)); break;
+    case 'year_asc': result.sort((a, b) => Number(a.year) - Number(b.year)); break;
+    case 'title_asc': result.sort((a, b) => (a.title || '').localeCompare(b.title || '')); break;
+    default: result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 
   return result;
@@ -384,7 +477,7 @@ function renderSeries() {
 }
 
 /* ===========================
-   Dashboard accurate 100%
+   Dashboard
    =========================== */
 function updateDashboard() {
   const movies = allMoviesForStats || [];
@@ -469,17 +562,11 @@ movieForm.addEventListener('submit', async (e) => {
 
   if (id) {
     const { error } = await db.from('movies').update({ title, year, genre, rating, status, rewatch, runtime }).eq('id', id);
-    if (error) {
-      console.error(error);
-      return showToast('فشل التحديث', 'error');
-    }
+    if (error) return showToast('فشل التحديث', 'error');
     showToast('تم تحديث الفيلم', 'success');
   } else {
     const { error } = await db.from('movies').insert([{ title, year, genre, rating, status, rewatch, runtime }]);
-    if (error) {
-      console.error(error);
-      return showToast('فشل الإضافة', 'error');
-    }
+    if (error) return showToast('فشل الإضافة', 'error');
     showToast('تمت إضافة الفيلم', 'success');
   }
 
@@ -489,10 +576,7 @@ movieForm.addEventListener('submit', async (e) => {
 
 async function editMovie(id) {
   const { data, error } = await db.from('movies').select('*').eq('id', id).single();
-  if (error || !data) {
-    console.error(error);
-    return showToast('تعذر تحميل بيانات الفيلم للتعديل', 'error');
-  }
+  if (error || !data) return showToast('تعذر تحميل بيانات الفيلم للتعديل', 'error');
 
   movieIdInput.value = data.id;
   document.getElementById('movie-title').value = data.title || '';
@@ -523,17 +607,14 @@ function resetMovieForm() {
 
 async function deleteMovie(id) {
   const { error } = await db.from('movies').delete().eq('id', id);
-  if (error) {
-    console.error(error);
-    return showToast('فشل حذف الفيلم', 'error');
-  }
+  if (error) return showToast('فشل حذف الفيلم', 'error');
   showToast('تم حذف الفيلم', 'success');
   await Promise.all([loadMoviesRecent(), loadStatsData()]);
 }
 window.deleteMovie = deleteMovie;
 
 /* ===========================
-   Series CRUD (same as movies)
+   Series CRUD
    =========================== */
 seriesForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -555,17 +636,11 @@ seriesForm.addEventListener('submit', async (e) => {
 
   if (id) {
     const { error } = await db.from('series').update({ title, year, seasons, rating, rewatch }).eq('id', id);
-    if (error) {
-      console.error(error);
-      return showToast('فشل التحديث', 'error');
-    }
+    if (error) return showToast('فشل التحديث', 'error');
     showToast('تم تحديث المسلسل', 'success');
   } else {
     const { error } = await db.from('series').insert([{ title, year, seasons, rating, rewatch }]);
-    if (error) {
-      console.error(error);
-      return showToast('فشل الإضافة', 'error');
-    }
+    if (error) return showToast('فشل الإضافة', 'error');
     showToast('تمت إضافة المسلسل', 'success');
   }
 
@@ -575,10 +650,7 @@ seriesForm.addEventListener('submit', async (e) => {
 
 async function editSeries(id) {
   const { data, error } = await db.from('series').select('*').eq('id', id).single();
-  if (error || !data) {
-    console.error(error);
-    return showToast('تعذر تحميل بيانات المسلسل للتعديل', 'error');
-  }
+  if (error || !data) return showToast('تعذر تحميل بيانات المسلسل للتعديل', 'error');
 
   seriesIdInput.value = data.id;
   document.getElementById('series-title').value = data.title || '';
@@ -606,27 +678,26 @@ function resetSeriesForm() {
 
 async function deleteSeries(id) {
   const { error } = await db.from('series').delete().eq('id', id);
-  if (error) {
-    console.error(error);
-    return showToast('فشل حذف المسلسل', 'error');
-  }
+  if (error) return showToast('فشل حذف المسلسل', 'error');
   showToast('تم حذف المسلسل', 'success');
   await Promise.all([loadSeriesRecent(), loadStatsData()]);
 }
 window.deleteSeries = deleteSeries;
 
 /* ===========================
-   Bind filters (debounced)
+   Bind filters
    =========================== */
 function bindFilters() {
   movieSearch.addEventListener('input', () => {
     clearTimeout(movieSearchTimer);
     movieSearchTimer = setTimeout(renderMovies, 250);
   });
+
   [filterGenre, filterYear, filterMinRating, filterStatus, sortMovies].forEach((el) => {
     el.addEventListener('change', renderMovies);
     el.addEventListener('input', renderMovies);
   });
+
   clearMovieFiltersBtn.addEventListener('click', () => {
     movieSearch.value = '';
     filterGenre.value = '';
@@ -637,14 +708,20 @@ function bindFilters() {
     renderMovies();
   });
 
+  if (printMovieFiltersBtn) {
+    printMovieFiltersBtn.addEventListener('click', printFilteredMovies);
+  }
+
   seriesSearch.addEventListener('input', () => {
     clearTimeout(seriesSearchTimer);
     seriesSearchTimer = setTimeout(renderSeries, 250);
   });
+
   [filterSeriesYear, filterSeriesMinRating, filterSeriesRewatch, sortSeries].forEach((el) => {
     el.addEventListener('change', renderSeries);
     el.addEventListener('input', renderSeries);
   });
+
   clearSeriesFiltersBtn.addEventListener('click', () => {
     seriesSearch.value = '';
     filterSeriesYear.value = '';
@@ -656,7 +733,7 @@ function bindFilters() {
 }
 
 /* ===========================
-   Movie Night Picker (from ALL plan movies)
+   Movie Night Picker
    =========================== */
 movieNightBtn.addEventListener('click', () => {
   const plan = allMoviesForStats.filter((m) => (m.status || 'watched') === 'plan');
@@ -667,11 +744,10 @@ movieNightBtn.addEventListener('click', () => {
     return;
   }
 
-  // optional light filter
   const under150 = plan.filter((m) => !m.runtime || Number(m.runtime) <= 150);
   const source = under150.length ? under150 : plan;
-
   const picked = source[Math.floor(Math.random() * source.length)];
+
   movieNightResult.hidden = false;
   movieNightResult.innerHTML = `
     <b>🎬 اختيار الليلة:</b> ${escapeHtml(picked.title)}<br>
