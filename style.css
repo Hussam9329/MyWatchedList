@@ -486,10 +486,25 @@ body {
     visibility: hidden !important;
   }
 }
-/* إخفاء الهيدر في الجوال */
-@media (max-width: 768px) {
-  header {
+
+/* ✅ إخفاء الهيدر/الفوتر فقط عند فتح التطبيق بوضع standalone */
+@media (display-mode: standalone) {
+  .main-header,
+  .page-footer {
     display: none !important;
+  }
+
+  body {
+    padding-top: 12px;
+  }
+
+  .container {
+    max-width: 980px;
   }
 }
 
+/* ✅ دعم iOS standalone عبر class من JS */
+body.ios-standalone .main-header,
+body.ios-standalone .page-footer {
+  display: none !important;
+}
