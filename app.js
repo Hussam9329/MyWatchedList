@@ -60,34 +60,68 @@ function formatRating(num) {
     return n.toFixed(2);
 }
 
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 
 /* ===========================
-   ===== الأفلام =====
+   ===== الأفلام (مع Pagination) =====
    =========================== */
 
 var movieForm = document.getElementById('movie-form');
 var moviesList = document.getElementById('movies-list');
 var moviesCount = document.getElementById('movies-count');
 
-async function loadMovies() {
+var currentMoviePage = 0;
+var moviePageSize = 50;
+var isLoadingMoreMovies = false;
+var hasMoreMovies = true;
+
+
+async function loadMovies(isLoadMore = false) {
+    if (isLoadingMoreMovies) return;
+    if (!isLoadMore) {
+        moviesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
+        currentMoviePage = 0;
+        hasMoreMovies = true;
+    }
+
+    isLoadingMoreMovies = true;
+    
+    var from = currentMoviePage * moviePageSize;
+    var to = from + moviePageSize - 1;
+
     var result = await db
         .from('movies')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to); // <-- هنا سر الحل: جلب 50 فيلم فقط في كل مرة
 
     if (result.error) {
         console.error('خطأ في تحميل الأفلام:', result.error);
+        showToast('حدث خطأ أثناء التحميل', 'error');
+        isLoadingMoreMovies = false;
         return;
     }
 
     var movies = result.data;
-    moviesCount.textContent = movies.length;
+    
+    // تحديث العدد الكلي (يمكنك استبداله بعدد ثابت من قاعدة البيانات إذا أردت)
+    moviesCount.textContent = (isLoadMore ? moviesList.querySelectorAll('.item-card').length : 0) + movies.length;
 
-    if (movies.length === 0) {
+    if (movies.length < moviePageSize) {
+        hasMoreMovies = false; // لم يعد هناك المزيد من الأفلام
+    }
+
+    if (!isLoadMore && movies.length === 0) {
         moviesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-film fa-3x"></i>' +
             '<p>لم تضف أي أفلام بعد</p>' +
             '</div>';
+        isLoadingMoreMovies = false;
         return;
     }
 
@@ -110,7 +144,29 @@ async function loadMovies() {
         '</div>';
     });
 
-    moviesList.innerHTML = html;
+    if (isLoadMore) {
+        // إزالة زر "تحميل المزيد" القديم إذا وُجد
+        var oldBtn = document.getElementById('load-more-movies-btn');
+        if(oldBtn) oldBtn.remove();
+        
+        moviesList.insertAdjacentHTML('beforeend', html);
+    } else {
+        moviesList.innerHTML = html;
+    }
+
+    // إضافة زر "تحميل المزيد" إذا كانت هناك أفلام أخرى
+    if (hasMoreMovies) {
+        moviesList.insertAdjacentHTML('beforeend', 
+            '<button id="load-more-movies-btn" class="load-more-btn" onclick="loadMoreMovies()">تحميل المزيد...</button>'
+        );
+    }
+
+    isLoadingMoreMovies = false;
+}
+
+function loadMoreMovies() {
+    currentMoviePage++;
+    loadMovies(true);
 }
 
 movieForm.addEventListener('submit', async function(e) {
@@ -159,32 +215,58 @@ async function deleteMovie(id) {
 
 
 /* ===========================
-   ===== المسلسلات =====
+   ===== المسلسلات (مع Pagination) =====
    =========================== */
 
 var seriesForm = document.getElementById('series-form');
 var seriesList = document.getElementById('series-list');
 var seriesCount = document.getElementById('series-count');
 
-async function loadSeries() {
+var currentSeriesPage = 0;
+var seriesPageSize = 50;
+var isLoadingMoreSeries = false;
+var hasMoreSeries = true;
+
+
+async function loadSeries(isLoadMore = false) {
+    if (isLoadingMoreSeries) return;
+    if (!isLoadMore) {
+        seriesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
+        currentSeriesPage = 0;
+        hasMoreSeries = true;
+    }
+
+    isLoadingMoreSeries = true;
+
+    var from = currentSeriesPage * seriesPageSize;
+    var to = from + seriesPageSize - 1;
+
     var result = await db
         .from('series')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to); // <-- نفس الحل للمسلسلات
 
     if (result.error) {
         console.error('خطأ في تحميل المسلسلات:', result.error);
+        showToast('حدث خطأ أثناء التحميل', 'error');
+        isLoadingMoreSeries = false;
         return;
     }
 
     var allSeries = result.data;
-    seriesCount.textContent = allSeries.length;
+    seriesCount.textContent = (isLoadMore ? seriesList.querySelectorAll('.item-card').length : 0) + allSeries.length;
 
-    if (allSeries.length === 0) {
+    if (allSeries.length < seriesPageSize) {
+        hasMoreSeries = false;
+    }
+
+    if (!isLoadMore && allSeries.length === 0) {
         seriesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-tv fa-3x"></i>' +
             '<p>لم تضف أي مسلسلات بعد</p>' +
             '</div>';
+        isLoadingMoreSeries = false;
         return;
     }
 
@@ -208,7 +290,27 @@ async function loadSeries() {
         '</div>';
     });
 
-    seriesList.innerHTML = html;
+    if (isLoadMore) {
+        var oldBtn = document.getElementById('load-more-series-btn');
+        if(oldBtn) oldBtn.remove();
+        
+        seriesList.insertAdjacentHTML('beforeend', html);
+    } else {
+        seriesList.innerHTML = html;
+    }
+
+    if (hasMoreSeries) {
+        seriesList.insertAdjacentHTML('beforeend', 
+            '<button id="load-more-series-btn" class="load-more-btn" onclick="loadMoreSeries()">تحميل المزيد...</button>'
+        );
+    }
+
+    isLoadingMoreSeries = false;
+}
+
+function loadMoreSeries() {
+    currentSeriesPage++;
+    loadSeries(true);
 }
 
 seriesForm.addEventListener('submit', async function(e) {
@@ -253,17 +355,6 @@ async function deleteSeries(id) {
 
     showToast('تم حذف المسلسل', 'success');
     loadSeries();
-}
-
-
-/* ===========================
-   حماية من XSS (حقن الأكواد)
-   =========================== */
-
-function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 
