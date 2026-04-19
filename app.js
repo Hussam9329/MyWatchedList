@@ -6,7 +6,7 @@
 
 // ← استبدل هاتين القيمتين بمفاتيحك من Supabase
 const SUPABASE_URL = 'https://lbwjdleewjtlqhnjwzsn.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_mOmd2B7tn4QFx8g9X-pYNQ_LH5Htv1q';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxid2pkbGVld2p0bHFobmp3enNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1ODEyNzAsImV4cCI6MjA5MjE1NzI3MH0.U8D4EMaPwKNnDchYpUyHd1SoAVqhl4jmNmI53MIHWNY';
 
 // إنشاء عميل Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
