@@ -46,6 +46,7 @@ const filterStatus = document.getElementById('filter-status');
 const sortMovies = document.getElementById('sort-movies');
 const clearMovieFiltersBtn = document.getElementById('clear-movie-filters');
 const printMovieFiltersBtn = document.getElementById('print-movie-filters');
+const printLimitSelect = document.getElementById('print-limit');
 
 const seriesSearch = document.getElementById('series-search');
 const filterSeriesYear = document.getElementById('filter-series-year');
@@ -271,21 +272,12 @@ function applyMovieFiltersOnAll(arr) {
   const y = Number(filterYear.value);
   const minR = Number(filterMinRating.value);
   const st = filterStatus.value;
-  const sort = sortMovies.value;
 
   if (q) result = result.filter((m) => (m.title || '').toLowerCase().includes(q));
   if (g) result = result.filter((m) => m.genre === g);
   if (filterYear.value) result = result.filter((m) => Number(m.year) === y);
   if (filterMinRating.value) result = result.filter((m) => Number(m.rating) >= minR);
   if (st) result = result.filter((m) => (m.status || 'watched') === st);
-
-  switch (sort) {
-    case 'rating_desc': result.sort((a, b) => Number(b.rating) - Number(a.rating)); break;
-    case 'year_desc': result.sort((a, b) => Number(b.year) - Number(a.year)); break;
-    case 'year_asc': result.sort((a, b) => Number(a.year) - Number(b.year)); break;
-    case 'title_asc': result.sort((a, b) => (a.title || '').localeCompare(b.title || '')); break;
-    default: result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
 
   return result;
 }
@@ -332,16 +324,36 @@ function renderMovies() {
    Print filtered movies
    =========================== */
 function printFilteredMovies() {
-  const filtered = applyMovieFiltersOnAll(allMoviesForStats || [])
-  .sort((a, b) => (a.title || '').localeCompare((b.title || ''), 'en', { sensitivity: 'base' }));
-
+  let filtered = applyMovieFiltersOnAll(allMoviesForStats || []);
 
   if (!filtered.length) {
     showToast('لا توجد نتائج للطباعة حسب الفلاتر الحالية', 'error');
     return;
   }
 
+  const limitValue = printLimitSelect ? printLimitSelect.value : 'all';
+  const isTopMode = limitValue !== 'all';
+  const limit = isTopMode ? Number(limitValue) : null;
+
+  if (isTopMode) {
+    // أفضل أفلام حسب التقييم ثم الاسم
+    filtered = filtered
+      .sort((a, b) => {
+        const r = Number(b.rating) - Number(a.rating);
+        if (r !== 0) return r;
+        return (a.title || '').localeCompare((b.title || ''), 'en', { sensitivity: 'base' });
+      })
+      .slice(0, limit);
+  } else {
+    // طباعة الكل أبجديًا
+    filtered = filtered.sort((a, b) =>
+      (a.title || '').localeCompare((b.title || ''), 'en', { sensitivity: 'base' })
+    );
+  }
+
+  const modeLabel = isTopMode ? `أفضل ${limit} حسب التقييم` : 'طباعة الكل (أبجدي)';
   const filtersSummary = `
+    النمط: ${escapeHtml(modeLabel)} |
     السنة: ${escapeHtml(filterYear.value || 'الكل')} |
     النوع: ${escapeHtml(filterGenre.value || 'الكل')} |
     الحالة: ${escapeHtml(filterStatus.value || 'الكل')} |
@@ -386,7 +398,7 @@ function printFilteredMovies() {
     <body>
       <h1>قائمة الأفلام المفلترة</h1>
       <div class="meta">${filtersSummary}</div>
-      <div class="count">عدد النتائج: ${filtered.length}</div>
+      <div class="count">عدد النتائج المطبوعة: ${filtered.length}</div>
 
       <table>
         <thead>
@@ -707,6 +719,7 @@ function bindFilters() {
     filterMinRating.value = '';
     filterStatus.value = '';
     sortMovies.value = 'latest_added';
+    if (printLimitSelect) printLimitSelect.value = 'all';
     renderMovies();
   });
 
