@@ -87,7 +87,7 @@ async function loadMovies() {
     movies.forEach(function(movie) {
         html += '<div class="item-card">' +
             '<div class="item-rating ' + getRatingClass(movie.rating) + '">' +
-                movie.rating +
+                Number(movie.rating).toFixed(2) +
             '</div>' +
             '<div class="item-info">' +
                 '<div class="item-title">' + escapeHtml(movie.title) + '</div>' +
@@ -185,7 +185,7 @@ async function loadSeries() {
         var seasonWord = s.seasons === 1 ? 'موسم' : 'مواسم';
         html += '<div class="item-card">' +
             '<div class="item-rating ' + getRatingClass(s.rating) + '">' +
-                s.rating +
+                Number(s.rating).toFixed(2) +
             '</div>' +
             '<div class="item-info">' +
                 '<div class="item-title">' + escapeHtml(s.title) + '</div>' +
