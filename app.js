@@ -2,7 +2,7 @@
    Supabase
    =========================== */
 const SUPABASE_URL = 'https://lbwjdleewjtlqhnjwzsn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxid2pkbGVld2p0bHFobmp3enNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1ODEyNzAsImV4cCI6MjA5MjE1NzI3MH0.U8D4EMaPwKNnDchYpUyHd1SoAVqhl4jmNmI53MIHWNY';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ===========================
@@ -106,6 +106,21 @@ function statusClass(status) {
   if (status === 'watched') return 'status-watched';
   if (status === 'watching') return 'status-watching';
   return 'status-plan';
+}
+
+/* ===========================
+   PWA / Standalone detection
+   =========================== */
+function detectStandaloneMode() {
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true; // iOS Safari
+
+  if (isStandalone) {
+    document.body.classList.add('ios-standalone');
+  } else {
+    document.body.classList.remove('ios-standalone');
+  }
 }
 
 /* ===========================
@@ -774,6 +789,7 @@ movieNightBtn.addEventListener('click', () => {
    Init
    =========================== */
 async function init() {
+  detectStandaloneMode(); // ✅ مهم لوضع التطبيق
   initTheme();
   bindFilters();
 
