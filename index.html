@@ -33,17 +33,17 @@
         <i class="fas fa-film"></i>
       </div>
       <h1>قائمة المشاهدة</h1>
-      <p class="subtitle">سجّل كل ما شاهدته من أفلام ومسلسلات + اكتشف فيلم الليلة 🎬</p>
+      <p class="subtitle">آخر 5 عناصر فقط للعرض + إحصائيات دقيقة من كل البيانات</p>
     </header>
 
     <section class="dashboard-card">
       <h2 class="list-title"><i class="fas fa-chart-line"></i> إحصائيات سريعة</h2>
       <div class="stats-grid">
-        <div class="stat-item"><span>عدد الأعمال</span><strong id="stat-total">0</strong></div>
+        <div class="stat-item"><span>عدد الأعمال الكلي</span><strong id="stat-total">0</strong></div>
         <div class="stat-item"><span>أكثر Genre</span><strong id="stat-top-genre">-</strong></div>
         <div class="stat-item"><span>متوسط التقييم</span><strong id="stat-avg-rating">0</strong></div>
         <div class="stat-item"><span>أكثر سنة إنتاج</span><strong id="stat-top-year">-</strong></div>
-        <div class="stat-item"><span>مشاهدات هذا الشهر</span><strong id="stat-this-month">0</strong></div>
+        <div class="stat-item"><span>عدد هذا الشهر</span><strong id="stat-this-month">0</strong></div>
       </div>
     </section>
 
@@ -111,7 +111,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="movie-rating">تقييمي الشخصي (من 100)</label>
+              <label for="movie-rating">التقييم (0-100)</label>
               <div class="rating-input-wrapper">
                 <input type="number" id="movie-rating" placeholder="85.5" min="0" max="100" step="any" required />
                 <span class="rating-max">/ 100</span>
@@ -145,24 +145,21 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-submit" id="movie-submit-btn">
-              <i class="fas fa-plus"></i>
-              إضافة الفيلم
+              <i class="fas fa-plus"></i> إضافة الفيلم
             </button>
             <button type="button" class="btn-secondary" id="movie-cancel-edit" hidden>إلغاء التعديل</button>
           </div>
         </form>
       </div>
 
-      <!-- Filters -->
       <div class="list-card">
-        <h2 class="list-title"><i class="fas fa-filter"></i> فلترة وبحث</h2>
+        <h2 class="list-title"><i class="fas fa-filter"></i> بحث + فلترة + ترتيب (على آخر 5)</h2>
 
         <div class="filters-grid">
           <div class="form-group">
-            <label for="movie-search">بحث مباشر</label>
+            <label for="movie-search">بحث</label>
             <input type="text" id="movie-search" placeholder="ابحث باسم الفيلم..." />
           </div>
-
           <div class="form-group">
             <label for="filter-genre">النوع</label>
             <select id="filter-genre">
@@ -190,17 +187,14 @@
               <option value="Other">Other</option>
             </select>
           </div>
-
           <div class="form-group">
             <label for="filter-year">السنة</label>
-            <input type="number" id="filter-year" placeholder="مثال: 2024" min="1900" max="2100" />
+            <input type="number" id="filter-year" min="1900" max="2100" placeholder="2024" />
           </div>
-
           <div class="form-group">
             <label for="filter-min-rating">تقييم أعلى من</label>
-            <input type="number" id="filter-min-rating" placeholder="70" min="0" max="100" step="any" />
+            <input type="number" id="filter-min-rating" min="0" max="100" step="any" placeholder="70" />
           </div>
-
           <div class="form-group">
             <label for="filter-status">الحالة</label>
             <select id="filter-status">
@@ -210,11 +204,10 @@
               <option value="plan">Plan to Watch</option>
             </select>
           </div>
-
           <div class="form-group">
             <label for="sort-movies">الترتيب</label>
             <select id="sort-movies">
-              <option value="latest_added">حسب مدة الإضافة (Latest added)</option>
+              <option value="latest_added">Latest added</option>
               <option value="rating_desc">الأعلى تقييمًا</option>
               <option value="year_desc">الأحدث</option>
               <option value="year_asc">الأقدم</option>
@@ -234,15 +227,10 @@
       <div class="list-card">
         <h2 class="list-title">
           <i class="fas fa-list"></i>
-          الأفلام
+          آخر الأفلام
           <span id="movies-count" class="count-badge">0</span>
         </h2>
-        <div id="movies-list" class="items-list">
-          <div class="empty-state">
-            <i class="fas fa-film fa-3x"></i>
-            <p>لم تضف أي أفلام بعد</p>
-          </div>
-        </div>
+        <div id="movies-list" class="items-list"></div>
       </div>
     </section>
 
@@ -265,23 +253,22 @@
           <div class="form-row">
             <div class="form-group">
               <label for="series-year">سنة الإنتاج</label>
-              <input type="number" id="series-year" placeholder="2008" min="1900" max="2100" required />
+              <input type="number" id="series-year" min="1900" max="2100" required />
             </div>
             <div class="form-group">
               <label for="series-seasons">عدد المواسم</label>
-              <input type="number" id="series-seasons" placeholder="5" min="1" max="100" required />
+              <input type="number" id="series-seasons" min="1" max="100" required />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="series-rating">تقييمي الشخصي (من 100)</label>
+              <label for="series-rating">التقييم (0-100)</label>
               <div class="rating-input-wrapper">
-                <input type="number" id="series-rating" placeholder="90.5" min="0" max="100" step="any" required />
+                <input type="number" id="series-rating" min="0" max="100" step="any" required />
                 <span class="rating-max">/ 100</span>
               </div>
             </div>
-
             <div class="form-group">
               <label for="series-rewatch">هل يستحق إعادة مشاهدة؟</label>
               <select id="series-rewatch" required>
@@ -293,8 +280,7 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-submit" id="series-submit-btn">
-              <i class="fas fa-plus"></i>
-              إضافة المسلسل
+              <i class="fas fa-plus"></i> إضافة المسلسل
             </button>
             <button type="button" class="btn-secondary" id="series-cancel-edit" hidden>إلغاء التعديل</button>
           </div>
@@ -302,22 +288,58 @@
       </div>
 
       <div class="list-card">
-        <h2 class="list-title">
-          <i class="fas fa-list"></i>
-          المسلسلات
-          <span id="series-count" class="count-badge">0</span>
-        </h2>
-        <div id="series-list" class="items-list">
-          <div class="empty-state">
-            <i class="fas fa-tv fa-3x"></i>
-            <p>لم تضف أي مسلسلات بعد</p>
+        <h2 class="list-title"><i class="fas fa-filter"></i> بحث + فلترة + ترتيب (على آخر 5)</h2>
+
+        <div class="filters-grid">
+          <div class="form-group">
+            <label for="series-search">بحث</label>
+            <input type="text" id="series-search" placeholder="ابحث باسم المسلسل..." />
+          </div>
+          <div class="form-group">
+            <label for="filter-series-year">السنة</label>
+            <input type="number" id="filter-series-year" min="1900" max="2100" placeholder="2010" />
+          </div>
+          <div class="form-group">
+            <label for="filter-series-min-rating">تقييم أعلى من</label>
+            <input type="number" id="filter-series-min-rating" min="0" max="100" step="any" placeholder="70" />
+          </div>
+          <div class="form-group">
+            <label for="filter-series-rewatch">إعادة مشاهدة</label>
+            <select id="filter-series-rewatch">
+              <option value="">الكل</option>
+              <option value="true">✅ نعم</option>
+              <option value="false">❌ لا</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="sort-series">الترتيب</label>
+            <select id="sort-series">
+              <option value="latest_added">Latest added</option>
+              <option value="rating_desc">الأعلى تقييمًا</option>
+              <option value="year_desc">الأحدث</option>
+              <option value="year_asc">الأقدم</option>
+              <option value="title_asc">A-Z</option>
+            </select>
           </div>
         </div>
+
+        <div class="filter-actions">
+          <button class="btn-secondary" id="clear-series-filters">مسح الفلاتر</button>
+        </div>
+      </div>
+
+      <div class="list-card">
+        <h2 class="list-title">
+          <i class="fas fa-list"></i>
+          آخر المسلسلات
+          <span id="series-count" class="count-badge">0</span>
+        </h2>
+        <div id="series-list" class="items-list"></div>
       </div>
     </section>
 
     <footer class="page-footer">
-      <p>مشروع قائمة المشاهدة — HTML + CSS + JavaScript + Supabase</p>
+      <p>مشروع قائمة المشاهدة — Supabase + JS</p>
     </footer>
   </div>
 
