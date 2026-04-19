@@ -1,15 +1,11 @@
-
-
 /* ===========================
    إعداد اتصال Supabase
    =========================== */
 
-// ← استبدل هاتين القيمتين بمفاتيحك من Supabase
 const SUPABASE_URL = 'https://lbwjdleewjtlqhnjwzsn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxid2pkbGVld2p0bHFobmp3enNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1ODEyNzAsImV4cCI6MjA5MjE1NzI3MH0.U8D4EMaPwKNnDchYpUyHd1SoAVqhl4jmNmI53MIHWNY';
 
-// إنشاء عميل Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
 /* ===========================
@@ -19,14 +15,11 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
 
-// عند الضغط على أي تبويب
 tabs.forEach(function(tab) {
     tab.addEventListener('click', function() {
-        // إزالة الحالة النشطة من كل التبويبات
         tabs.forEach(function(t) { t.classList.remove('active'); });
         tabContents.forEach(function(c) { c.classList.remove('active'); });
 
-        // تفعيل التبويب المضغوط
         tab.classList.add('active');
         var tabName = tab.getAttribute('data-tab');
         document.getElementById(tabName + '-section').classList.add('active');
@@ -43,7 +36,6 @@ function showToast(message, type) {
     toast.textContent = message;
     toast.className = 'toast toast-' + type + ' show';
 
-    // إخفاء الرسالة بعد ثانيتين
     setTimeout(function() {
         toast.classList.remove('show');
     }, 2000);
@@ -54,7 +46,6 @@ function showToast(message, type) {
    دوال مساعدة
    =========================== */
 
-// تحديد لون التقييم حسب القيمة
 function getRatingClass(rating) {
     if (rating >= 70) return 'rating-high';
     if (rating >= 40) return 'rating-mid';
@@ -70,9 +61,8 @@ var movieForm = document.getElementById('movie-form');
 var moviesList = document.getElementById('movies-list');
 var moviesCount = document.getElementById('movies-count');
 
-// عرض كل الأفلام من قاعدة البيانات
 async function loadMovies() {
-    var result = await supabase
+    var result = await db
         .from('movies')
         .select('*')
         .order('created_at', { ascending: false });
@@ -85,7 +75,6 @@ async function loadMovies() {
     var movies = result.data;
     moviesCount.textContent = movies.length;
 
-    // إذا لم تكن هناك أفلام
     if (movies.length === 0) {
         moviesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-film fa-3x"></i>' +
@@ -94,7 +83,6 @@ async function loadMovies() {
         return;
     }
 
-    // بناء قائمة الأفلام
     var html = '';
     movies.forEach(function(movie) {
         html += '<div class="item-card">' +
@@ -117,7 +105,6 @@ async function loadMovies() {
     moviesList.innerHTML = html;
 }
 
-// إضافة فيلم جديد
 movieForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -126,14 +113,12 @@ movieForm.addEventListener('submit', async function(e) {
     var genre = document.getElementById('movie-genre').value;
     var rating = parseFloat(document.getElementById('movie-rating').value);
 
-    // التحقق من صحة التقييم
     if (rating < 0 || rating > 100) {
         showToast('التقييم يجب أن يكون بين 0 و 100', 'error');
         return;
     }
 
-    // إرسال البيانات إلى Supabase
-    var result = await supabase
+    var result = await db
         .from('movies')
         .insert([{ title: title, year: year, genre: genre, rating: rating }]);
 
@@ -148,9 +133,8 @@ movieForm.addEventListener('submit', async function(e) {
     loadMovies();
 });
 
-// حذف فيلم
 async function deleteMovie(id) {
-    var result = await supabase
+    var result = await db
         .from('movies')
         .delete()
         .eq('id', id);
@@ -174,9 +158,8 @@ var seriesForm = document.getElementById('series-form');
 var seriesList = document.getElementById('series-list');
 var seriesCount = document.getElementById('series-count');
 
-// عرض كل المسلسلات من قاعدة البيانات
 async function loadSeries() {
-    var result = await supabase
+    var result = await db
         .from('series')
         .select('*')
         .order('created_at', { ascending: false });
@@ -189,7 +172,6 @@ async function loadSeries() {
     var allSeries = result.data;
     seriesCount.textContent = allSeries.length;
 
-    // إذا لم تكن هناك مسلسلات
     if (allSeries.length === 0) {
         seriesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-tv fa-3x"></i>' +
@@ -198,7 +180,6 @@ async function loadSeries() {
         return;
     }
 
-    // بناء قائمة المسلسلات
     var html = '';
     allSeries.forEach(function(s) {
         var seasonWord = s.seasons === 1 ? 'موسم' : 'مواسم';
@@ -222,7 +203,6 @@ async function loadSeries() {
     seriesList.innerHTML = html;
 }
 
-// إضافة مسلسل جديد
 seriesForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -231,14 +211,12 @@ seriesForm.addEventListener('submit', async function(e) {
     var seasons = parseInt(document.getElementById('series-seasons').value);
     var rating = parseFloat(document.getElementById('series-rating').value);
 
-    // التحقق من صحة التقييم
     if (rating < 0 || rating > 100) {
         showToast('التقييم يجب أن يكون بين 0 و 100', 'error');
         return;
     }
 
-    // إرسال البيانات إلى Supabase
-    var result = await supabase
+    var result = await db
         .from('series')
         .insert([{ title: title, year: year, seasons: seasons, rating: rating }]);
 
@@ -253,9 +231,8 @@ seriesForm.addEventListener('submit', async function(e) {
     loadSeries();
 });
 
-// حذف مسلسل
 async function deleteSeries(id) {
-    var result = await supabase
+    var result = await db
         .from('series')
         .delete()
         .eq('id', id);
