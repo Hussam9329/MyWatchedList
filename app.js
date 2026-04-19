@@ -68,60 +68,49 @@ function escapeHtml(text) {
 
 
 /* ===========================
-   ===== الأفلام (مع Pagination) =====
+   ===== الأفلام (العدد الكلي + آخر 5 فقط) =====
    =========================== */
 
 var movieForm = document.getElementById('movie-form');
 var moviesList = document.getElementById('movies-list');
 var moviesCount = document.getElementById('movies-count');
 
-var currentMoviePage = 0;
-var moviePageSize = 50;
-var isLoadingMoreMovies = false;
-var hasMoreMovies = true;
+async function loadMovies() {
+    moviesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
 
+    // 1. جلب العدد الكلي
+    var countResult = await db
+        .from('movies')
+        .select('*', { count: 'exact', head: true }); // head: true يجلب العدد فقط بدون البيانات
 
-async function loadMovies(isLoadMore = false) {
-    if (isLoadingMoreMovies) return;
-    if (!isLoadMore) {
-        moviesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
-        currentMoviePage = 0;
-        hasMoreMovies = true;
+    var totalCount = 0;
+    if (!countResult.error) {
+        totalCount = countResult.count;
     }
-
-    isLoadingMoreMovies = true;
     
-    var from = currentMoviePage * moviePageSize;
-    var to = from + moviePageSize - 1;
+    // عرض العدد الكلي
+    moviesCount.textContent = totalCount;
 
+    // 2. جلب آخر 5 أفلام فقط
     var result = await db
         .from('movies')
         .select('*')
         .order('created_at', { ascending: false })
-        .range(from, to); // <-- هنا سر الحل: جلب 50 فيلم فقط في كل مرة
+        .limit(5); // <-- هنا السر: جلب 5 أفلام فقط
 
     if (result.error) {
         console.error('خطأ في تحميل الأفلام:', result.error);
-        showToast('حدث خطأ أثناء التحميل', 'error');
-        isLoadingMoreMovies = false;
+        moviesList.innerHTML = '';
         return;
     }
 
     var movies = result.data;
-    
-    // تحديث العدد الكلي (يمكنك استبداله بعدد ثابت من قاعدة البيانات إذا أردت)
-    moviesCount.textContent = (isLoadMore ? moviesList.querySelectorAll('.item-card').length : 0) + movies.length;
 
-    if (movies.length < moviePageSize) {
-        hasMoreMovies = false; // لم يعد هناك المزيد من الأفلام
-    }
-
-    if (!isLoadMore && movies.length === 0) {
+    if (movies.length === 0) {
         moviesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-film fa-3x"></i>' +
             '<p>لم تضف أي أفلام بعد</p>' +
             '</div>';
-        isLoadingMoreMovies = false;
         return;
     }
 
@@ -144,29 +133,7 @@ async function loadMovies(isLoadMore = false) {
         '</div>';
     });
 
-    if (isLoadMore) {
-        // إزالة زر "تحميل المزيد" القديم إذا وُجد
-        var oldBtn = document.getElementById('load-more-movies-btn');
-        if(oldBtn) oldBtn.remove();
-        
-        moviesList.insertAdjacentHTML('beforeend', html);
-    } else {
-        moviesList.innerHTML = html;
-    }
-
-    // إضافة زر "تحميل المزيد" إذا كانت هناك أفلام أخرى
-    if (hasMoreMovies) {
-        moviesList.insertAdjacentHTML('beforeend', 
-            '<button id="load-more-movies-btn" class="load-more-btn" onclick="loadMoreMovies()">تحميل المزيد...</button>'
-        );
-    }
-
-    isLoadingMoreMovies = false;
-}
-
-function loadMoreMovies() {
-    currentMoviePage++;
-    loadMovies(true);
+    moviesList.innerHTML = html;
 }
 
 movieForm.addEventListener('submit', async function(e) {
@@ -215,58 +182,49 @@ async function deleteMovie(id) {
 
 
 /* ===========================
-   ===== المسلسلات (مع Pagination) =====
+   ===== المسلسلات (العدد الكلي + آخر 5 فقط) =====
    =========================== */
 
 var seriesForm = document.getElementById('series-form');
 var seriesList = document.getElementById('series-list');
 var seriesCount = document.getElementById('series-count');
 
-var currentSeriesPage = 0;
-var seriesPageSize = 50;
-var isLoadingMoreSeries = false;
-var hasMoreSeries = true;
+async function loadSeries() {
+    seriesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
 
+    // 1. جلب العدد الكلي
+    var countResult = await db
+        .from('series')
+        .select('*', { count: 'exact', head: true });
 
-async function loadSeries(isLoadMore = false) {
-    if (isLoadingMoreSeries) return;
-    if (!isLoadMore) {
-        seriesList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin fa-3x"></i><p>جاري التحميل...</p></div>';
-        currentSeriesPage = 0;
-        hasMoreSeries = true;
+    var totalCount = 0;
+    if (!countResult.error) {
+        totalCount = countResult.count;
     }
+    
+    // عرض العدد الكلي
+    seriesCount.textContent = totalCount;
 
-    isLoadingMoreSeries = true;
-
-    var from = currentSeriesPage * seriesPageSize;
-    var to = from + seriesPageSize - 1;
-
+    // 2. جلب آخر 5 مسلسلات فقط
     var result = await db
         .from('series')
         .select('*')
         .order('created_at', { ascending: false })
-        .range(from, to); // <-- نفس الحل للمسلسلات
+        .limit(5); // <-- جلب 5 مسلسلات فقط
 
     if (result.error) {
         console.error('خطأ في تحميل المسلسلات:', result.error);
-        showToast('حدث خطأ أثناء التحميل', 'error');
-        isLoadingMoreSeries = false;
+        seriesList.innerHTML = '';
         return;
     }
 
     var allSeries = result.data;
-    seriesCount.textContent = (isLoadMore ? seriesList.querySelectorAll('.item-card').length : 0) + allSeries.length;
 
-    if (allSeries.length < seriesPageSize) {
-        hasMoreSeries = false;
-    }
-
-    if (!isLoadMore && allSeries.length === 0) {
+    if (allSeries.length === 0) {
         seriesList.innerHTML = '<div class="empty-state">' +
             '<i class="fas fa-tv fa-3x"></i>' +
             '<p>لم تضف أي مسلسلات بعد</p>' +
             '</div>';
-        isLoadingMoreSeries = false;
         return;
     }
 
@@ -290,27 +248,7 @@ async function loadSeries(isLoadMore = false) {
         '</div>';
     });
 
-    if (isLoadMore) {
-        var oldBtn = document.getElementById('load-more-series-btn');
-        if(oldBtn) oldBtn.remove();
-        
-        seriesList.insertAdjacentHTML('beforeend', html);
-    } else {
-        seriesList.innerHTML = html;
-    }
-
-    if (hasMoreSeries) {
-        seriesList.insertAdjacentHTML('beforeend', 
-            '<button id="load-more-series-btn" class="load-more-btn" onclick="loadMoreSeries()">تحميل المزيد...</button>'
-        );
-    }
-
-    isLoadingMoreSeries = false;
-}
-
-function loadMoreSeries() {
-    currentSeriesPage++;
-    loadSeries(true);
+    seriesList.innerHTML = html;
 }
 
 seriesForm.addEventListener('submit', async function(e) {
