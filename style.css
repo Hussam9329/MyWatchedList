@@ -300,6 +300,22 @@ body {
   margin-top: 10px;
   flex-wrap: wrap;
 }
+
+.print-select {
+  min-width: 180px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--fg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: var(--font);
+}
+.print-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
 #print-movie-filters {
   border-style: dashed;
 }
@@ -461,6 +477,7 @@ body {
   .form-row { flex-direction: column; gap: 0; }
   .filters-grid, .stats-grid { grid-template-columns: 1fr; }
   .filter-actions { flex-direction: column; }
+  .print-select { width: 100%; }
 }
 
 /* اختيارياً: إخفاء الواجهة الأصلية لو طباعة من نفس الصفحة */
