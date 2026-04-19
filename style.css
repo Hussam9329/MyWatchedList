@@ -298,7 +298,15 @@ body {
   display: flex;
   gap: 8px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
+#print-movie-filters {
+  border-style: dashed;
+}
+#print-movie-filters i {
+  margin-left: 6px;
+}
+
 .picker-result {
   margin-top: 10px;
   padding: 10px;
@@ -453,4 +461,11 @@ body {
   .form-row { flex-direction: column; gap: 0; }
   .filters-grid, .stats-grid { grid-template-columns: 1fr; }
   .filter-actions { flex-direction: column; }
+}
+
+/* اختيارياً: إخفاء الواجهة الأصلية لو طباعة من نفس الصفحة */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
 }
